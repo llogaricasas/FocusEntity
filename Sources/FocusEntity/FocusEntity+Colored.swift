@@ -36,6 +36,8 @@ public extension FocusEntity {
             case .texture(let tex):
                 var mat = UnlitMaterial()
                 mat.color = .init(tint: .white.withAlphaComponent(0.9999), texture: .init(tex))
+                mat.blending = .transparent
+                mat.faceCulling = .none
                 modelMaterial = mat
             @unknown default: break
             }
