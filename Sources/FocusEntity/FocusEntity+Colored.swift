@@ -25,22 +25,30 @@ public extension FocusEntity {
             self.fillPlane?.model?.materials = [SimpleMaterial()]
         }
         var modelMaterial: Material!
-        
-        switch endColor {
-        case .color(let uikitColour):
-            var mat = PhysicallyBasedMaterial()
-            mat.baseColor = .init(tint: .black.withAlphaComponent(uikitColour.cgColor.alpha))
-            mat.emissiveColor = .init(color: uikitColour)
-            mat.emissiveIntensity = 2
+
+        if #available(iOS 18, macOS 15, *) {
+            switch endColor {
+            case .color(let uikitColour):
+                var mat = PhysicallyBasedMaterial()
+                mat.baseColor = .init(tint: .black.withAlphaComponent(uikitColour.cgColor.alpha))
+                mat.emissiveColor = .init(color: uikitColour)
+                mat.emissiveIntensity = 2
+                modelMaterial = mat
+            case .texture(let tex):
+                var mat = UnlitMaterial()
+                mat.color = .init(tint: .white.withAlphaComponent(0.9999), texture: .init(tex))
+                mat.blending = .transparent
+                mat.faceCulling = .none
+                modelMaterial = mat
+            @unknown default: break
+            }
+        } else {
+            var mat = UnlitMaterial(color: .clear)
+            mat.baseColor = endColor
+            mat.tintColor = .white.withAlphaComponent(0.9999)
             modelMaterial = mat
-        case .texture(let tex):
-            var mat = UnlitMaterial()
-            mat.color = .init(tint: .white.withAlphaComponent(0.9999), texture: .init(tex))
-            mat.blending = .transparent(opacity: 0.5)
-            mat.faceCulling = .none
-            modelMaterial = mat
-        @unknown default: break
         }
+        
         self.fillPlane?.model?.materials[0] = modelMaterial
     }
 }
